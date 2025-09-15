@@ -1,0 +1,11 @@
+Prover/*
+.env
+__pycache__/
+*.pyc
+db.sqlite3
+*.log
+*.pot
+*.py~
+*.swp
+# Ignore Docker files
+docker-compose.override.yml
