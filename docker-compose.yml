@@ -2,10 +2,12 @@ services:
   proxy:
     image: nginx:alpine
     volumes:
-      - ./fastapi/app:/var/www/html/api
+      - ./django/Prover:/var/www/html
       - ./nginx/conf.d:/etc/nginx/conf.d
     ports:
       - "80:80"
+    depends_on:
+      - django
     networks:
       - app_network
 
@@ -13,10 +15,11 @@ services:
     build:
       context: ./django
     volumes:
-      - ./Prover/app:/app  # Volume para os arquivos da aplicação Django
-    # command: >
-    #   sh -c "python manage.py migrate &&
-    #          python manage.py runserver"
+      - ./django/Prover:/app
+    depends_on:
+      - mysql
+    environment:
+      - DJANGO_SETTINGS_MODULE=Prover.settings  # ou 'hello.settings' dependendo do seu nome de projeto
     networks:
       - app_network
 

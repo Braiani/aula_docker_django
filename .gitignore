@@ -1,4 +1,5 @@
 Prover/*
+django/Prover/*
 .env
 __pycache__/
 *.pyc
