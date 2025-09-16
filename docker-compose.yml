@@ -16,8 +16,8 @@ services:
   django:
     build:
       context: ./django
-    volumes:
-      - ./django/app:/app
+    # volumes:
+    #   - ./django/app:/app
     depends_on:
       - mysql
     networks:

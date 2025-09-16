@@ -17,13 +17,19 @@ WORKDIR /app
 COPY ./scripts/requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
+RUN pip install gunicorn
+RUN pip install whitenoise
+
+
 # Copia o restante do código da aplicação
 COPY ./app/ /app/
 
 COPY ./scripts/wait-for-it.sh /scripts/wait-for-it.sh
 RUN chmod +x /scripts/wait-for-it.sh
 
+RUN python manage.py collectstatic --noinput
+
 EXPOSE 8000
 
 # Comando para rodar a aplicação
-CMD ["sh", "-c", "/scripts/wait-for-it.sh mysql:3306 -- python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+CMD ["sh", "-c", "/scripts/wait-for-it.sh mysql:3306 -- python manage.py migrate && gunicorn --bind 0.0.0.0:8000 ProjetoProver.wsgi:application"]
