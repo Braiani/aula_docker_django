@@ -2,7 +2,7 @@ services:
   proxy:
     image: nginx:alpine
     volumes:
-      - ./django/Prover:/var/www/html
+      - ./django/app:/var/www/html
       - ./nginx/conf.d:/etc/nginx/conf.d
     ports:
       - "80:80"
@@ -15,11 +15,11 @@ services:
     build:
       context: ./django
     volumes:
-      - ./django/Prover:/app
+      - ./django/app:/app
+    # ports:
+    #   - 8000:8000
     depends_on:
       - mysql
-    environment:
-      - DJANGO_SETTINGS_MODULE=Prover.settings  # ou 'hello.settings' dependendo do seu nome de projeto
     networks:
       - app_network
 
@@ -30,8 +30,10 @@ services:
       MYSQL_DATABASE: app_db
       MYSQL_USER: app_user
       MYSQL_PASSWORD: app_password
+    # ports:
+    #   - 3306:3306
     volumes:
-      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql_data:/var/lib/mysql
     networks:
       - app_network

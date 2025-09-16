@@ -14,13 +14,16 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copia o arquivo de requisitos e instala as dependências do Python
-COPY ./Prover/requirements.txt /app/
+COPY ./scripts/requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia o restante do código da aplicação
-COPY ./Prover/ /app/
+COPY ./app/ /app/
+
+COPY ./scripts/wait-for-it.sh /scripts/wait-for-it.sh
+RUN chmod +x /scripts/wait-for-it.sh
 
 EXPOSE 8000
 
 # Comando para rodar a aplicação
-CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+CMD ["sh", "-c", "/scripts/wait-for-it.sh mysql:3306 -- python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
