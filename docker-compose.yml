@@ -1,13 +1,15 @@
 services:
-  proxy:
-    image: nginx:alpine
-    volumes:
-      - ./django/app:/var/www/html
-      - ./nginx/conf.d:/etc/nginx/conf.d
+  traefik:
+    image: traefik:latest
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --entrypoints.web.address=:80
     ports:
       - "80:80"
-    depends_on:
-      - django
+      - "8080:8080" # Painel Traefik
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - app_network
 
@@ -16,12 +18,15 @@ services:
       context: ./django
     volumes:
       - ./django/app:/app
-    # ports:
-    #   - 8000:8000
     depends_on:
       - mysql
     networks:
       - app_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.django.rule=Host(`maranata.local`)"
+      - "traefik.http.routers.django.entrypoints=web"
+      - "traefik.http.services.django.loadbalancer.server.port=8000"
 
   mysql:
     image: mysql:latest
@@ -30,10 +35,7 @@ services:
       MYSQL_DATABASE: app_db
       MYSQL_USER: app_user
       MYSQL_PASSWORD: app_password
-    # ports:
-    #   - 3306:3306
     volumes:
-      # - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql_data:/var/lib/mysql
     networks:
       - app_network
